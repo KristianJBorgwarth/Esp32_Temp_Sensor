@@ -20,9 +20,14 @@ class app:
         print("Starting the app")
 
     def update(self):
-        print("Updating the app")
-        time.sleep(1)
+        while(self._isRunning):
+            print("Updating the app")
+            time.sleep(1)
 
+    def stop(self):
+        self._isRunning = False
+        print("Shutting down")
+    
     def add_object(self, tag, obj):
         self._objectDict[tag] = obj
 
@@ -32,11 +37,6 @@ class app:
     def delete_object(self, tag):
         del self._objectDict[tag]
         gc.collect()
-
-    def stop(self):
-        self._isRunning = False
-        print("Shutting down")
-    
 
 
     
