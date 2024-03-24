@@ -5,7 +5,7 @@ import gc
 class app: 
     _instance = None
     _isRunning = True
-    _objectDict = {}
+    _objectDict: dict = {}
 
     def __new__(cls):
         if cls._instance is None:
