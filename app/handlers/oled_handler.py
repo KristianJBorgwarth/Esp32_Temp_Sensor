@@ -1,4 +1,4 @@
-from drivers.SSD1306 import SSD1306 as ssd
+import drivers.SSD1306 as SSD1306
 from machine import Pin, SoftI2C
 
 class oled_handler:
@@ -10,12 +10,12 @@ class oled_handler:
             i2c = SoftI2C(scl=Pin(22), sda=Pin(21))
             oled_width = 128
             oled_width = 64
-            cls._instance.ssd_driver = ssd(i2c, oled_width, oled_width)
+            cls._instance.oled = SSD1306.SSD1306_I2C(oled_width, oled_width, i2c)
         return cls._instance
 
     # This method will print the message to the OLED screen
     def print_to_screen(self, message):
-        self.ssd_driver.fill(0)
+        self.oled.fill(0)
         max_chars_per_line = 15
         words = message.split(' ')
         lines = []

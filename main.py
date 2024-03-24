@@ -1,6 +1,5 @@
 from debug_tools.I2C_device_tester import I2CDeviceTester
-from machine import ADC, Pin
-import time
+from app.application import app
 
 # Create a ModuleConnectionTester object
 I2C_tester = I2CDeviceTester(scl_pin=22, sda_pin=21)
@@ -8,12 +7,17 @@ I2C_tester = I2CDeviceTester(scl_pin=22, sda_pin=21)
 # Check the connection
 I2C_tester.check_display_connection()
 
-adc_y = ADC(Pin(36))  # Assuming Pin 33 for Y-axis
+# Create an app object
+app = app()
 
-adc_y.atten(ADC.ATTN_11DB)
+# Initialize the app
+app.initialize()
 
-while True:
-    x_value = adc_y.read()
+# Start the app
+app.start()
 
-    print("X: ", x_value)
-    time.sleep(2)
+# Update the app
+app.update()
+
+# Stop the app
+app.stop()
