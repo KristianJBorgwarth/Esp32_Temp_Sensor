@@ -1,41 +1,41 @@
-from abc import ABC, abstractmethod
-
-class IState(ABC):
-    @abstractmethod
+class IState():
     def __init__(self):
-        pass
+        if type(self) == IState:
+            raise Exception("<IState> cannot be instantiated")
 
-    @abstractmethod
     def enter(self):
-        pass
+        raise NotImplementedError("Subclasses should implement this!")
 
-    @abstractmethod
     def execute(self):
-        pass
+        raise NotImplementedError("Subclasses should implement this!")
 
-    @abstractmethod
     def exit(self):
-        pass
+        raise NotImplementedError("Subclasses should implement this!")
 
-class StateMachine(ABC):
-    @abstractmethod
+class StateMachine:
     def __init__(self, state: IState):
-        pass
+        self._current_state = state
+        self._previous_state = None
+        self._current_state.enter()
 
-    @abstractmethod
     def update(self):
-        pass
+        self._current_state.execute()
 
-    @abstractmethod
     def change_state(self, new_state: IState):
-        pass
+        if self._current_state == new_state:
+            return
+        
+        if self._current_state is not None:
+            self._previous_state = self._current_state
+            self._current_state.exit()
 
-    @abstractmethod
+        self._current_state = new_state
+        self._current_state.enter()
+
     def get_state(self):
-        pass
+        return self._current_state
 
-    @abstractmethod
     def get_previous_state(self):
-        pass
+        return self._previous_state
 
 
