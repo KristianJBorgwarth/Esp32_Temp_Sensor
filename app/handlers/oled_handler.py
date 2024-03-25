@@ -1,7 +1,7 @@
 import drivers.SSD1306 as SSD1306
 from machine import Pin, SoftI2C
 
-class oled_handler:
+class OLEDHandler:
     _instance = None
 
     def __new__(cls):

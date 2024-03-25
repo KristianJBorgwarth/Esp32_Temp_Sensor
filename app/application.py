@@ -1,5 +1,5 @@
 import time
-from app.handlers.oled_handler import oled_handler as oled
+from app.handlers.oled_handler import OLEDHandler as oled
 import gc
 
 class app: 
