@@ -1,12 +1,12 @@
 from app.handlers.oled_handler import OLEDHandler as oled
 from lib.state_machine import IState
-from app.application import Application
 
 class MainMenuState(IState):
-    def __init__(self, oled: oled, app: Application):
+    def __init__(self, oled: oled):
         self.oled = oled
-        self.app = app
-        self.input_handler = app.get_object("input")
+        from app.application import Application 
+        self.app = Application()
+        self.input_handler = self.app.get_object("input")
         self.menu_items = [WifiMenuItem(), ExitMenuItem()]
         self.selected_item = 0
         
@@ -16,7 +16,6 @@ class MainMenuState(IState):
     def execute(self):
         input_value = self.input_handler.read_joystick_input()
         if input_value:
-
             if input_value == "up":
                 self.selected_item = (self.selected_item - 1) % len(self.menu_items)
             elif input_value == "down":
@@ -32,7 +31,7 @@ class MainMenuState(IState):
 
 class WifiMenuItem:
     def __init__(self):
-        self.display_text = "Wifi"
+        self.display_text = "Settings"
     
     def command(self):
         print("Wifi menu item selected")

@@ -1,8 +1,9 @@
 import time
-from app.handlers.oled_handler import OLEDHandler as oled
 import gc
+from app.handlers.oled_handler import OLEDHandler as oled
 from lib.state_machine import StateMachine
 from app.handlers.input_handler import InputHandler
+from app.states.main_menu import MainMenuState as MMS
 
 class Application: 
     _instance = None
@@ -16,12 +17,10 @@ class Application:
         return cls._instance
     
     def initialize(self):
-        #move the local imports to the classes instead of the app to minimize the bloat here
-        from app.states.main_menu import MainMenuState as MMS
         print("Initializing the app")
         self.add_object("oled", oled())
         self.add_object("input", InputHandler())
-        self.add_object("msm", StateMachine(MMS(self.get_object("oled"), self)), "update")
+        self.add_object("msm", StateMachine(MMS(self.get_object("oled"))), "update")
 
     def start(self):
         print("Starting the app")
@@ -44,7 +43,6 @@ class Application:
 
     def get_object(self, tag, type = None):
         if type == "update":
-            print("trying to fetch object")
             return self._updateObjects[tag]
         else:
             return self._objects[tag]
