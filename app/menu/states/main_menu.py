@@ -23,7 +23,7 @@ class MainMenuState(IState):
             elif input_value == "press":
                 self.menu_items[self.selected_item].command()
         
-        self.oled.print_menu(self.menu_items, self.selected_item)
+        self.oled.print_menu(self.menu_items, self.selected_item, "Main Menu")
 
     def exit(self):
         pass

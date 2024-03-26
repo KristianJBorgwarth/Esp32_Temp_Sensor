@@ -32,9 +32,9 @@ class OLEDHandler:
         
         self.oled.show()
 
-    def print_menu(self, items, selected_item):
+    def print_menu(self, items, selected_item, menu_title):
         self.clear_screen()
-        self.display_menu_title("Main Menu")
+        self.display_menu_title(menu_title)
         self.display_menu_items(items, selected_item)
         self.oled.show()
     
