@@ -15,9 +15,11 @@ class Application:
         return cls._instance
     
     def initialize(self):
-        from app.menu.states.main_menu import MainMenuState as MMS
+        from app.states.main_menu import MainMenuState as MMS
+        from app.handlers.input_handler import InputHandler
         print("Initializing the app")
         self.add_object("oled", oled())
+        self.add_object("input", InputHandler(self))
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"), self)), "update")
 
     def start(self):
@@ -26,7 +28,6 @@ class Application:
     def update(self):
         while(self._isRunning):
             for obj in self._updateObjects.values():
-                print("Updating")
                 obj.update()
             time.sleep(0.2)
 
