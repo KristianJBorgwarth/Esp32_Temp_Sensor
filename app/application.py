@@ -2,6 +2,7 @@ import time
 from app.handlers.oled_handler import OLEDHandler as oled
 import gc
 from lib.state_machine import StateMachine
+from app.handlers.input_handler import InputHandler
 
 class Application: 
     _instance = None
@@ -19,7 +20,7 @@ class Application:
         from app.states.main_menu import MainMenuState as MMS
         print("Initializing the app")
         self.add_object("oled", oled())
-        self.add_object("input", InputHandler(self))
+        self.add_object("input", InputHandler())
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"), self)), "update")
 
     def start(self):
