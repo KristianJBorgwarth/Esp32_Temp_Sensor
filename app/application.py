@@ -17,7 +17,6 @@ class Application:
     def initialize(self):
         #move the local imports to the classes instead of the app to minimize the bloat here
         from app.states.main_menu import MainMenuState as MMS
-        from app.handlers.input_handler import InputHandler
         print("Initializing the app")
         self.add_object("oled", oled())
         self.add_object("input", InputHandler(self))

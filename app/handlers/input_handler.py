@@ -1,9 +1,7 @@
 from machine import ADC, Pin
-from app.application import Application
 
 class InputHandler:
-    def __init__(self, app: Application):
-        self.app = app
+    def __init__(self):
         self.a_button = Pin(26, Pin.IN, Pin.PULL_UP)
         self.b_button = Pin(5, Pin.IN, Pin.PULL_UP)
         self.joy_stick = ADC(Pin(36))
