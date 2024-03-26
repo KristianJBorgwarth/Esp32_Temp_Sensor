@@ -31,7 +31,7 @@ class MainMenuState(IState):
 
 class WifiMenuItem:
     def __init__(self):
-        self.display_text = "Wifi"
+        self.display_text = "Settings"
     
     def command(self):
         print("Wifi menu item selected")

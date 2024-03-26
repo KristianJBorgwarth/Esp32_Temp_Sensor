@@ -43,7 +43,6 @@ class Application:
 
     def get_object(self, tag, type = None):
         if type == "update":
-            print("trying to fetch object")
             return self._updateObjects[tag]
         else:
             return self._objects[tag]
