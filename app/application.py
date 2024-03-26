@@ -15,6 +15,7 @@ class Application:
         return cls._instance
     
     def initialize(self):
+        #move the local imports to the classes instead of the app to minimize the bloat here
         from app.states.main_menu import MainMenuState as MMS
         from app.handlers.input_handler import InputHandler
         print("Initializing the app")
@@ -29,8 +30,8 @@ class Application:
         while(self._isRunning):
             for obj in self._updateObjects.values():
                 obj.update()
-            time.sleep(0.2)
-
+            time.sleep(0.1)
+            
     def stop(self):
         self._isRunning = False
         print("Shutting down")
@@ -43,6 +44,7 @@ class Application:
 
     def get_object(self, tag, type = None):
         if type == "update":
+            print("trying to fetch object")
             return self._updateObjects[tag]
         else:
             return self._objects[tag]

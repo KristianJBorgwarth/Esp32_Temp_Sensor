@@ -34,3 +34,12 @@ class OLEDHandler:
                 self.oled.text(line.strip(), 0, i * 10)
         
         self.oled.show()
+
+    def print_menu(self, items, selected_item):
+        self.oled.fill(0)
+        for i, item in enumerate(items):
+            if i == selected_item:
+                self.oled.text(">" + item.display_text, 0, i * 10)
+            else:
+                self.oled.text(item.display_text, 0, i * 10)
+        self.oled.show()

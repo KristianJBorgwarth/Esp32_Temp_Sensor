@@ -24,7 +24,6 @@ class StateMachine:
     def change_state(self, new_state: IState):
         if self._current_state == new_state:
             return
-        
         if self._current_state is not None:
             self._previous_state = self._current_state
             self._current_state.exit()
