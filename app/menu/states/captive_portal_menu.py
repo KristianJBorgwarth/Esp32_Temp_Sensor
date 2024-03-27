@@ -8,7 +8,7 @@ class CaptivePortalMenu(IState):
         self.captive_portal = imph.import_app().get_object("cpm")
     
     def enter(self):
-        self.captive_portal.start_web_server()
+        self.captive_portal.web_server()
 
     def execute(self):
         self.oled.print_to_screen("Captive Portal", 0, 0)

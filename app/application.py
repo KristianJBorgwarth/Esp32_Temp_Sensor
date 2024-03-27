@@ -20,7 +20,7 @@ class Application:
     def initialize(self):
         print("Initializing the app")
         self.add_object("oled", oled())
-        self.add_object("cpm", WifiManager("ESP32_AP", "12345678"))
+        self.add_object("cpm", WifiManager("ESP32_AP", "12345678").connect())
         self.add_object("input", InputHandler())
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"))), "update")
 
