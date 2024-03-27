@@ -3,7 +3,7 @@ import gc
 from app.handlers.oled_handler import OLEDHandler as oled
 from lib.state_machine import StateMachine
 from app.handlers.input_handler import InputHandler
-from app.states.main_menu import MainMenuState as MMS
+from app.menu.states.main_menu import MainMenuState as MMS
 
 class Application: 
     _instance = None
@@ -34,6 +34,7 @@ class Application:
     def stop(self):
         self._isRunning = False
         print("Shutting down")
+        time.sleep(1)
     
     def add_object(self, tag, obj, type = None):
         if type == "update":

@@ -1,19 +1,19 @@
 from app.handlers.oled_handler import OLEDHandler as oled
 from lib.state_machine import IState
-from app.menu.items.main_menu_items import SettingsMenuItem, TemperatureMenuItem
-from app.menu.items.core_menu_items import ExitMenuItem
+from app.menu.items.settings_items import WifiMenuItem, UpdateMenuItem
+from app.menu.items.core_menu_items import BackMenuItem
 
-class MainMenuState(IState):
+class SettingsMenuState(IState):
     def __init__(self, oled: oled):
         self.oled = oled
         from app.application import Application 
         self.app = Application()
         self.input_handler = self.app.get_object("input")
-        self.menu_items = None 
+        self.menu_items = None
         self.selected_item = 0
         
     def enter(self):
-        self.menu_items = [SettingsMenuItem(), TemperatureMenuItem(), ExitMenuItem()]
+        self.menu_items = [WifiMenuItem(), UpdateMenuItem(), BackMenuItem()]
 
     def execute(self):
         input_value = self.input_handler.read_joystick_input()
@@ -28,7 +28,7 @@ class MainMenuState(IState):
             elif input_value == "down":
                 self.selected_item = (self.selected_item + 1) % len(self.menu_items)
         
-        self.oled.print_menu(self.menu_items, self.selected_item, "Main Menu")
+        self.oled.print_menu(self.menu_items, self.selected_item, "Settings Menu")
 
     def exit(self):
         pass

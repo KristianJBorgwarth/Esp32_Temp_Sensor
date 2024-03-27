@@ -10,9 +10,9 @@ class InputHandler:
         
     def read_button_input(self):
         if self.a_button.value() == 0:
-            print("A button pressed")
+            return "A"
         if self.b_button.value() == 0:
-            print("B button pressed")
+            return "B"
     
     def read_joystick_input(self):
         val_in = self.joy_stick.read()
