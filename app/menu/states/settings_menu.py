@@ -16,16 +16,16 @@ class SettingsMenuState(IState):
         self.menu_items = [WifiMenuItem(), UpdateMenuItem(), BackMenuItem()]
 
     def execute(self):
-        input_value = self.input_handler.read_joystick_input()
-        b_input_value = self.input_handler.read_button_input()
-        
-        if b_input_value == "A":
+        joystick_input_value = self.input_handler.read_joystick_input()
+        button_input_value = self.input_handler.read_button_input()
+
+        if button_input_value == "A":
             self.menu_items[self.selected_item].command()
 
-        if input_value:
-            if input_value == "up":
+        if joystick_input_value:
+            if joystick_input_value == "up":
                 self.selected_item = (self.selected_item - 1) % len(self.menu_items)
-            elif input_value == "down":
+            elif joystick_input_value == "down":
                 self.selected_item = (self.selected_item + 1) % len(self.menu_items)
         
         self.oled.print_menu(self.menu_items, self.selected_item, "Settings Menu")
