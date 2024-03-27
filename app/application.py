@@ -20,9 +20,11 @@ class Application:
     def initialize(self):
         print("Initializing the app")
         self.add_object("oled", oled())
-        self.add_object("cpm", WifiManager("ESP32_AP", "12345678").connect())
+        wfm = self.initialize_wifi()
+        self.add_object("cpm", wfm)
         self.add_object("input", InputHandler())
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"))), "update")
+        print(len(self._objects))
 
     def start(self):
         print("Starting the app")
@@ -48,6 +50,8 @@ class Application:
         if type == "update":
             return self._updateObjects[tag]
         else:
+            print("returning object")
+            print(self._objects[tag])
             return self._objects[tag]
     
     def delete_object(self, tag, type = None):
@@ -57,6 +61,10 @@ class Application:
             del self._objects[tag]
         gc.collect()
 
+    def initialize_wifi(self):
+        wfm = WifiManager("ESP32_AP", "12345678")
+        wfm.connect()
+        return wfm
     
 
 
