@@ -1,14 +1,12 @@
-from app.handlers.oled_handler import OLEDHandler as oled
 from lib.state_machine import IState
 from app.menu.items.settings_items import WifiMenuItem, UpdateMenuItem
 from app.menu.items.core_menu_items import BackMenuItem
+import helpers.import_helper as imph
 
 class SettingsMenuState(IState):
-    def __init__(self, oled: oled):
+    def __init__(self, oled):
         self.oled = oled
-        from app.application import Application 
-        self.app = Application()
-        self.input_handler = self.app.get_object("input")
+        self.input_handler = imph.import_app().get_object("input")
         self.menu_items = None
         self.selected_item = 0
         

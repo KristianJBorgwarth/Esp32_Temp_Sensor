@@ -5,7 +5,7 @@ from app.menu.items.core_menu_items import MenuItem
 class SettingsMenuItem(MenuItem):
     def __init__(self):
         super().__init__()
-        self.display_text = "Settings"
+        self.display_text = "SETTINGS"
     
     def command(self):
         app = imph.import_app()
@@ -16,7 +16,7 @@ class SettingsMenuItem(MenuItem):
 class TemperatureMenuItem(MenuItem):
     def __init__(self):
         super().__init__()
-        self.display_text = "Temperature"
+        self.display_text = "TEMPERATURE"
     
     def command(self):
         pass

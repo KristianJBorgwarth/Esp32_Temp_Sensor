@@ -9,7 +9,7 @@ class MenuItem:
     
 class BackMenuItem(MenuItem):
     def __init__(self):
-        self.display_text = "Back"
+        self.display_text = "BACK"
     
     def command(self):
         stm = imph.import_app().get_object("msm", "update")
@@ -18,7 +18,7 @@ class BackMenuItem(MenuItem):
 
 class ExitMenuItem(MenuItem):
     def __init__(self):
-        self.display_text = "Exit"
+        self.display_text = "EXIT"
     
     def command(self):
         imph.import_app().stop()
