@@ -4,6 +4,7 @@ from app.handlers.oled_handler import OLEDHandler as oled
 from lib.state_machine import StateMachine
 from app.handlers.input_handler import InputHandler
 from app.menu.states.main_menu import MainMenuState as MMS
+from lib.wifi_manager import WifiManager
 
 class Application: 
     _instance = None
@@ -19,6 +20,7 @@ class Application:
     def initialize(self):
         print("Initializing the app")
         self.add_object("oled", oled())
+        self.add_object("cpm", WifiManager("ESP32_AP", "12345678"))
         self.add_object("input", InputHandler())
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"))), "update")
 
