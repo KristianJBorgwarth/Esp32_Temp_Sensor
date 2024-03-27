@@ -27,7 +27,7 @@ class WifiMenuState(IState):
             elif joystick_input_value == "down":
                 self.selected_item = (self.selected_item + 1) % len(self.menu_items)
 
-        self.oled.print_menu(self.menu_items, self.selected_item, "Wifi Menu")
+        self.oled.print_menu(self.menu_items, self.selected_item, "WIFI")
 
     def exit(self):
         pass 

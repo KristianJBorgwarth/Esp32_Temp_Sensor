@@ -15,7 +15,7 @@ class IState():
 class StateMachine:
     def __init__(self, state: IState):
         self._current_state = state
-        self._previous_state = None
+        self._history_stack = []
         self._current_state.enter()
 
     def update(self):
@@ -25,10 +25,17 @@ class StateMachine:
         if self._current_state == new_state:
             return
         if self._current_state is not None:
-            self._previous_state = self._current_state
+            self._history_stack.append(self._current_state)
             self._current_state.exit()
 
         self._current_state = new_state
+        self._current_state.enter()
+
+    def go_back(self):
+        if len(self._history_stack) == 0:
+            return
+        self._current_state.exit()
+        self._current_state = self._history_stack.pop()
         self._current_state.enter()
 
     def get_state(self):
