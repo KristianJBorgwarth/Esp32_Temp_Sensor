@@ -50,8 +50,6 @@ class Application:
         if type == "update":
             return self._updateObjects[tag]
         else:
-            print("returning object")
-            print(self._objects[tag])
             return self._objects[tag]
     
     def delete_object(self, tag, type = None):

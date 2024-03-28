@@ -10,6 +10,7 @@ class WifiMenuState(IState):
         self.menu_items = None
         self.selected_item = 0
         self.oled = oled
+        
 
     def enter(self):
         self.menu_items = [CaptivePortalMenuItem(), SaveWifiMenuItem(), BackMenuItem()]
@@ -20,6 +21,7 @@ class WifiMenuState(IState):
 
         if button_input_value == "A":
             self.menu_items[self.selected_item].command()
+            return
 
         if joystick_input_value:
             if joystick_input_value == "up":
@@ -30,4 +32,5 @@ class WifiMenuState(IState):
         self.oled.print_menu(self.menu_items, self.selected_item, "WIFI")
 
     def exit(self):
-        pass 
+        print("Exiting wifi menu state")
+        self.oled.clear_screen()

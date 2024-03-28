@@ -1,3 +1,4 @@
+import gc
 class IState():
     def __init__(self):
         if type(self) == IState:
@@ -27,6 +28,7 @@ class StateMachine:
         if self._current_state is not None:
             self._history_stack.append(self._current_state)
             self._current_state.exit()
+            gc.collect()
 
         self._current_state = new_state
         self._current_state.enter()

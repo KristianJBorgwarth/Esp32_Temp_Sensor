@@ -3,25 +3,20 @@ import network
 import socket
 import re
 import time
-
+import helpers.import_helper as ih
 
 class WifiManager:
 
-    def __init__(self, ssid = 'WifiManager', password = 'wifimanager', reboot = True, debug = False):
+    def __init__(self, ssid = 'WifiManager', password = 'wifimanager', reboot = True, debug = True):
         self.wlan_sta = network.WLAN(network.STA_IF)
         self.wlan_sta.active(True)
         self.wlan_ap = network.WLAN(network.AP_IF)
+
+        if ih.validate_network_credentials(ssid, password) is False:
+            raise Exception("Invalid network credentials")
+        self.ap_ssid = ssid
+        self.ap_password = password
         
-        # Avoids simple mistakes with wifi ssid and password lengths, but doesn't check for forbidden or unsupported characters.
-        if len(ssid) > 32:
-            raise Exception('The SSID cannot be longer than 32 characters.')
-        else:
-            self.ap_ssid = ssid
-        if len(password) < 8:
-            raise Exception('The password cannot be less than 8 characters long.')
-        else:
-            self.ap_password = password
-            
         # Set the access point authentication mode to WPA2-PSK.
         self.ap_authmode = 3
         
@@ -31,13 +26,9 @@ class WifiManager:
         
         # Prevents the device from automatically trying to connect to the last saved network without first going through the steps defined in the code.
         self.wlan_sta.disconnect()
-        
-        # Change to True if you want the device to reboot after configuration.
-        # Useful if you're having problems with web server applications after WiFi configuration.
-        self.reboot = reboot
-        
+    
+        self.reboot = reboot      
         self.debug = debug
-
 
     def connect(self):
         if self.wlan_sta.isconnected():
@@ -49,20 +40,18 @@ class WifiManager:
                 password = profiles[ssid]
                 if self.wifi_connect(ssid, password):
                     return
-        print('Could not connect to any WiFi network')
+        if self.debug:
+            print('Could not connect to any WiFi network')
     
     def disconnect(self):
         if self.wlan_sta.isconnected():
             self.wlan_sta.disconnect()
 
-
     def is_connected(self):
         return self.wlan_sta.isconnected()
 
-
     def get_address(self):
         return self.wlan_sta.ifconfig()
-
 
     def write_credentials(self, profiles):
         lines = []
@@ -70,7 +59,6 @@ class WifiManager:
             lines.append('{0};{1}\n'.format(ssid, password))
         with open(self.wifi_credentials, 'w') as file:
             file.write(''.join(lines))
-
 
     def read_credentials(self):
         lines = []
@@ -102,6 +90,55 @@ class WifiManager:
         self.wlan_sta.disconnect()
         return False
 
+    def setup_web_server(self):
+        self.wlan_ap.active(True)
+        self.wlan_ap.config(essid = self.ap_ssid, password = self.ap_password, authmode = self.ap_authmode)
+        self.server_socket = socket.socket()
+        self.server_socket.close()
+        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.server_socket.bind(('', 80))
+        self.server_socket.listen(1)
+
+    def run_web_server(self):
+        if self.wlan_sta.isconnected():
+            self.wlan_ap.active(False)
+            if self.reboot:
+                print('The device will reboot in 5 seconds.')
+                time.sleep(5)
+                machine.reset()
+        self.client, addr = self.server_socket.accept()
+        try:
+            self.client.settimeout(5.0)
+            self.request = b''
+            try:
+                while True:
+                    if '\r\n\r\n' in self.request:
+                        # Fix for Safari browser
+                        self.request += self.client.recv(512)
+                        break
+                    self.request += self.client.recv(128)
+            except Exception as error:
+                # It's normal to receive timeout errors in this stage, we can safely ignore them.
+                if self.debug:
+                    print(error)
+                pass
+            if self.request:
+                if self.debug:
+                    print(self.url_decode(self.request))
+                url = re.search('(?:GET|POST) /(.*?)(?:\\?.*?)? HTTP', self.request).group(1).decode('utf-8').rstrip('/')
+                if url == '':
+                    self.handle_root()
+                elif url == 'configure':
+                    self.handle_configure()
+                else:
+                    self.handle_not_found()
+        except Exception as error:
+            if self.debug:
+                print(error)
+            return
+        finally:
+            self.client.close()
     
     def web_server(self):
         self.wlan_ap.active(True)
