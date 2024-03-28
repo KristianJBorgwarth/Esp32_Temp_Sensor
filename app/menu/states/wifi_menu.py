@@ -32,5 +32,4 @@ class WifiMenuState(IState):
         self.oled.print_menu(self.menu_items, self.selected_item, "WIFI")
 
     def exit(self):
-        print("Exiting wifi menu state")
         self.oled.clear_screen()

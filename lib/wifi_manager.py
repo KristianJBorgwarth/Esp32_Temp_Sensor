@@ -12,7 +12,7 @@ class WifiManager:
         self.wlan_sta = network.WLAN(network.STA_IF)
         self.wlan_sta.active(True)
         self.wlan_ap = network.WLAN(network.AP_IF)
-
+        self.oled = ih.import_app().get_object("oled")
         if ih.validate_network_credentials(ssid, password) is False:
             raise Exception("Invalid network credentials")
         self.ap_ssid = ssid
@@ -42,7 +42,8 @@ class WifiManager:
                 if self.wifi_connect(ssid, password):
                     return
         if self.debug:
-            print('Could not connect to any WiFi network')
+            self.oled.print_to_screen('Failed to\nconnect to WiFi')
+            time.sleep(3)
     
     def disconnect(self):
         if self.wlan_sta.isconnected():
@@ -78,16 +79,23 @@ class WifiManager:
 
 
     def wifi_connect(self, ssid, password):
-        print('Trying to connect to:', ssid)
+        connection_message = 'Connecting to: ' + ssid
+        self.oled.print_to_screen(connection_message)
+        time.sleep(3)
         self.wlan_sta.connect(ssid, password)
-        for _ in range(100):
+        for attempt in range(100):
             if self.wlan_sta.isconnected():
-                print('\nConnected! Network information:', self.wlan_sta.ifconfig())
+                self.oled.print_to_screen('\nConnected!\nNetwork information:\n'+str(self.wlan_sta.ifconfig()))
+                time.sleep(3)
                 return True
             else:
+                if attempt % 10 == 0:  # Update the display every 10 attempts to conserve resources
+                    loading_dots = '.' * (attempt // 10 % 4 + 1)  # Cycle through 1-4 dots
+                    self.oled.print_to_screen(connection_message + '\n' + loading_dots)
                 print('.', end='')
                 time.sleep_ms(100)
-        print('\nConnection failed!')
+        self.oled.print_to_screen('\nConnect failed!')
+        time.sleep(3)
         self.wlan_sta.disconnect()
         return False
 
@@ -110,8 +118,9 @@ class WifiManager:
         if self.wlan_sta.isconnected():
             self.wlan_ap.active(False)
             if self.reboot:
-                print('The device will reboot in 5 seconds.')
+                self.oled.print_to_screen('Device reboot\nin 5 seconds.')
                 time.sleep(5)
+                self.oled.clear_screen()
                 machine.reset()
         try:
             self.client, addr = self.server_socket.accept()

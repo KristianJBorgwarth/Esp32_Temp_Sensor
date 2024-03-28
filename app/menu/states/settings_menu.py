@@ -1,5 +1,5 @@
 from lib.state_machine import IState
-from app.menu.items.settings_items import WifiMenuItem, UpdateMenuItem
+from app.menu.items.settings_menu_items import WifiMenuItem, UpdateMenuItem
 from app.menu.items.core_menu_items import BackMenuItem
 import helpers.import_helper as imph
 

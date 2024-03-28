@@ -9,7 +9,6 @@ class CaptivePortalMenuItem(MenuItem):
 
     def command(self):
         imph.import_app().get_object("msm", "update").change_state(CaptivePortalMenu())
-        print("Changed to captive portal menu")
 
 class SaveWifiMenuItem(MenuItem):
     def __init__(self):

@@ -24,7 +24,6 @@ class Application:
         self.add_object("cpm", wfm)
         self.add_object("input", InputHandler())
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"))), "update")
-        print(len(self._objects))
 
     def start(self):
         print("Starting the app")
