@@ -3,6 +3,7 @@ import network
 import socket
 import re
 import time
+import errno
 import helpers.import_helper as ih
 
 class WifiManager:
@@ -90,6 +91,10 @@ class WifiManager:
         self.wlan_sta.disconnect()
         return False
 
+    def shutdown_portal(self):
+        self.wlan_ap.active(False)
+        self.server_socket.close()
+
     def setup_web_server(self):
         self.wlan_ap.active(True)
         self.wlan_ap.config(essid = self.ap_ssid, password = self.ap_password, authmode = self.ap_authmode)
@@ -99,6 +104,7 @@ class WifiManager:
         self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.server_socket.bind(('', 80))
         self.server_socket.listen(1)
+        self.server_socket.setblocking(False)
 
     def run_web_server(self):
         if self.wlan_sta.isconnected():
@@ -107,7 +113,17 @@ class WifiManager:
                 print('The device will reboot in 5 seconds.')
                 time.sleep(5)
                 machine.reset()
-        self.client, addr = self.server_socket.accept()
+        try:
+            self.client, addr = self.server_socket.accept()
+            # If we reach here, a client has connected successfully
+            # Proceed with handling the client
+        except Exception as error:
+            # If an exception occurs, it's likely because no client is connecting
+            # Log the error if debug is enabled, but don't raise it further
+            if self.debug:
+                print("No client connection available:", error)
+            return  # Simply return to allow for other operations, like checking for button presses
+
         try:
             self.client.settimeout(5.0)
             self.request = b''
@@ -140,56 +156,6 @@ class WifiManager:
         finally:
             self.client.close()
     
-    def web_server(self):
-        self.wlan_ap.active(True)
-        self.wlan_ap.config(essid = self.ap_ssid, password = self.ap_password, authmode = self.ap_authmode)
-        server_socket = socket.socket()
-        server_socket.close()
-        server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server_socket.bind(('', 80))
-        server_socket.listen(1)
-        print('Connect to', self.ap_ssid, 'with the password', self.ap_password, 'and access the captive portal at', self.wlan_ap.ifconfig()[0])
-        while True:
-            if self.wlan_sta.isconnected():
-                self.wlan_ap.active(False)
-                if self.reboot:
-                    print('The device will reboot in 5 seconds.')
-                    time.sleep(5)
-                    machine.reset()
-            self.client, addr = server_socket.accept()
-            try:
-                self.client.settimeout(5.0)
-                self.request = b''
-                try:
-                    while True:
-                        if '\r\n\r\n' in self.request:
-                            # Fix for Safari browser
-                            self.request += self.client.recv(512)
-                            break
-                        self.request += self.client.recv(128)
-                except Exception as error:
-                    # It's normal to receive timeout errors in this stage, we can safely ignore them.
-                    if self.debug:
-                        print(error)
-                    pass
-                if self.request:
-                    if self.debug:
-                        print(self.url_decode(self.request))
-                    url = re.search('(?:GET|POST) /(.*?)(?:\\?.*?)? HTTP', self.request).group(1).decode('utf-8').rstrip('/')
-                    if url == '':
-                        self.handle_root()
-                    elif url == 'configure':
-                        self.handle_configure()
-                    else:
-                        self.handle_not_found()
-            except Exception as error:
-                if self.debug:
-                    print(error)
-                return
-            finally:
-                self.client.close()
-
 
     def send_header(self, status_code = 200):
         self.client.send("""HTTP/1.1 {0} OK\r\n""".format(status_code))
