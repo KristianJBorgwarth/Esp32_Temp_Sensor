@@ -3,7 +3,6 @@ import network
 import socket
 import re
 import time
-import errno
 import helpers.import_helper as ih
 
 class WifiManager:
@@ -17,17 +16,9 @@ class WifiManager:
             raise Exception("Invalid network credentials")
         self.ap_ssid = ssid
         self.ap_password = password
-        
-        # Set the access point authentication mode to WPA2-PSK.
         self.ap_authmode = 3
-        
-        # The file were the credentials will be stored.
-        # There is no encryption, it's just a plain text archive. Be aware of this security problem!
         self.wifi_credentials = 'wifi.dat'
-        
-        # Prevents the device from automatically trying to connect to the last saved network without first going through the steps defined in the code.
         self.wlan_sta.disconnect()
-    
         self.reboot = reboot      
         self.debug = debug
 
@@ -262,12 +253,6 @@ class WifiManager:
 
 
     def url_decode(self, url_string):
-
-        # Source: https://forum.micropython.org/viewtopic.php?t=3076
-        # unquote('abc%20def') -> b'abc def'
-        # Note: strings are encoded as UTF-8. This is only an issue if it contains
-        # unescaped non-ASCII characters, which URIs should not.
-
         if not url_string:
             return b''
 
