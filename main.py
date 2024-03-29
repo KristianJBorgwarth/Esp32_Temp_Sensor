@@ -12,7 +12,7 @@ app = Application()
 
 # Initialize the app
 app.initialize()
-
+#test comment for ugit update
 # Start the app
 app.start()
 
