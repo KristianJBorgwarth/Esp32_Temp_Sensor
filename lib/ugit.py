@@ -13,14 +13,15 @@ import binascii
 import machine
 import time
 import network
+import gc
 
 global internal_tree
 
 #### -------------User Variables----------------####
 #### 
 # Default Network to connect using wificonnect()
-ssid = "OpenMuscle"
-password = "3141592653"
+ssid = "Telenor9920bue"
+password = "TYuY7QQKH"
 
 # CHANGE TO YOUR REPOSITORY INFO
 # Repository must be public if no personal access token is supplied
@@ -32,7 +33,7 @@ default_branch = 'main'
 
 # Don't remove ugit.py from the ignore_files unless you know what you are doing :D
 # Put the files you don't want deleted or updated here use '/filename.ext'
-ignore_files = ['/ugit.py', '/wifi.dat']
+ignore_files = ['/ugit.py', 'wifi.dat', 'README.md', "pymakr.conf"]
 ignore = ignore_files
 ### -----------END OF USER VARIABLES ----------####
 
@@ -42,25 +43,39 @@ giturl = 'https://github.com/{user}/{repository}'
 call_trees_url = f'https://api.github.com/repos/{user}/{repository}/git/trees/{default_branch}?recursive=1'
 raw = f'https://raw.githubusercontent.com/{user}/{repository}/master/'
 
-def pull(f_path,raw_url):
-  print(f'pulling {f_path} from github')
-  #files = os.listdir()
-  headers = {'User-Agent': 'ugit-turfptax'} 
-  # ^^^ Github Requires user-agent header otherwise 403
-  if len(token) > 0:
-      headers['authorization'] = "bearer %s" % token 
-  r = urequests.get(raw_url, headers=headers)
-  try:
-    new_file = open(f_path, 'w')
-    new_file.write(r.content.decode('utf-8'))
-    new_file.close()
-  except:
-    print('decode fail try adding non-code files to .gitignore')
+def pull(f_path, raw_url):
+    print(f'Pulling {f_path} from GitHub...')
+    headers = {'User-Agent': 'ugit-turfptax'}
+    if token:
+        headers['Authorization'] = f"Bearer {token}"
+    r = urequests.get(raw_url, headers=headers)
+    content = r.text  # Assuming the server returns UTF-8 text
+    r.close()
+    gc.collect()
+    print("free mem after pull: ", gc.mem_free())
     try:
-      new_file.close()
-    except:
-      print('tried to close new_file to save memory durring raw file decode')
-  
+        with open(f_path, 'w') as new_file:
+            new_file.write(content)
+            verify_file_write(f_path)
+    except Exception as e:
+        print(f'Error writing {f_path}: {e}')
+    finally:
+        gc.collect()
+        print("free mem after operation: ", gc.mem_free())
+
+
+def verify_file_write(path):
+    try:
+        stat_info = os.stat(path)
+        if stat_info and stat_info[6] > 0:  # Checking file size > 0
+            print(f"Verification successful for {path}")
+        else:
+            print(f"Verification failed for {path}: Empty file")
+    except OSError:
+        print(f"Verification failed for {path}: File not found")
+
+
+
 def pull_all(tree=call_trees_url,raw = raw,ignore = ignore,isconnected=False):
   if not isconnected:
       wlan = wificonnect() 
@@ -148,13 +163,17 @@ def add_to_tree(dir_item):
       print(f'{dir_item} could not be added to tree')
 
 
-def get_hash(file):
-  print(file)
-  o_file = open(file)
-  r_file = o_file.read()
-  sha1obj = hashlib.sha1(r_file)
-  hash = sha1obj.digest()
-  return(binascii.hexlify(hash))
+def get_hash(file_path):
+    hasher = hashlib.sha1()
+    with open(file_path, 'rb') as f:
+        while True:
+            chunk = f.read(4096)
+            if not chunk:
+                break
+            hasher.update(chunk)
+    return binascii.hexlify(hasher.digest()).decode('utf-8')
+
+
 
 def get_data_hash(data):
     sha1obj = hashlib.sha1(data)
@@ -169,12 +188,15 @@ def is_directory(file):
     return directory
     
 def pull_git_tree(tree_url=call_trees_url,raw = raw):
+  gc.collect()
   headers = {'User-Agent': 'ugit-turfptax'} 
   # ^^^ Github Requires user-agent header otherwise 403
   if len(token) > 0:
       headers['authorization'] = "bearer %s" % token 
   r = urequests.get(tree_url,headers=headers)
+  gc.collect()
   data = json.loads(r.content.decode('utf-8'))
+  gc.collect()
   if 'tree' not in data:
       print('\nDefault branch "main" not found. Set "default_branch" variable to your default branch.\n')
       raise Exception(f'Default branch {default_branch} not found.') 
