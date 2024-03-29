@@ -1,6 +1,7 @@
 from app.menu.items.core_menu_items import MenuItem
 import helpers.import_helper as imph
 from app.menu.states.wifi_menu import WifiMenuState
+import lib.ugit as ugit
 
 class WifiMenuItem(MenuItem):
     def __init__(self):
@@ -20,4 +21,5 @@ class UpdateMenuItem(MenuItem):
     
     def command(self):
         print("Update menu item selected")
+        ugit.pull_all(isconnected=True)
         
