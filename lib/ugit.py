@@ -24,8 +24,8 @@ password = "3141592653"
 
 # CHANGE TO YOUR REPOSITORY INFO
 # Repository must be public if no personal access token is supplied
-user = 'turfptax'
-repository = 'ugit_test'
+user = 'KristianJBorgwarth'
+repository = 'Esp32_Temp_Sensor'
 token = ''
 # Change this variable to 'master' or any other name matching your default branch
 default_branch = 'main'
