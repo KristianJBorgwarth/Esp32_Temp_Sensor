@@ -13,9 +13,8 @@ class BackMenuItem(MenuItem):
     
     def command(self):
         stm = imph.import_app().get_object("msm", "update")
-        prev_state = stm.get_previous_state()
-        stm.change_state(prev_state)
-
+        stm.go_back()
+        
 class ExitMenuItem(MenuItem):
     def __init__(self):
         self.display_text = "EXIT"

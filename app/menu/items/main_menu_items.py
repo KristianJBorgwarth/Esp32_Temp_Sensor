@@ -1,5 +1,5 @@
 import helpers.import_helper as imph
-from app.menu.states.settings_menu import SettingsMenuState as sms
+from app.menu.states.settings_menu import SettingsMenuState
 from app.menu.items.core_menu_items import MenuItem
 
 class SettingsMenuItem(MenuItem):
@@ -11,7 +11,7 @@ class SettingsMenuItem(MenuItem):
         app = imph.import_app()
         stm = app.get_object("msm", "update")
         oled = app.get_object("oled")
-        stm.change_state(sms(oled))
+        stm.change_state(SettingsMenuState(oled))
 
 class TemperatureMenuItem(MenuItem):
     def __init__(self):

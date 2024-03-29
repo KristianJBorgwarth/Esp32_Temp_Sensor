@@ -12,24 +12,29 @@ class OLEDHandler:
 
     # This method will print the message to the OLED screen
     def print_to_screen(self, message):
-        self.oled.fill(0)
-        max_chars_per_line = 7
-        words = message.split(' ')
-        lines = []
-        current_line = ''
-        
-        for word in words:
-            if len(current_line) + len(word) + 1 <= max_chars_per_line:
-                current_line += (word + ' ')
-            else:
-                lines.append(current_line)
-                current_line = word + ' '
-        lines.append(current_line)  # Add the last line
-        
-        for i, line in enumerate(lines):
-            if i < 8:
-                self.oled.text(line.strip(), 0, i * 10)
-        
+        self.oled.fill(0)  # Clear the display first
+        lines = message.split('\n')  # Split the message into lines at each '\n'
+    
+        processed_lines = []
+        for line in lines:
+            # Further split each line into words to respect max_chars_per_line
+            words = line.split(' ')
+            current_line = ''
+            for word in words:
+                # Check if adding the next word exceeds the line width
+                if len(current_line) + len(word) <= 28:
+                    current_line += (word + ' ')
+                else:
+                    # Line is full, add to processed lines and start a new one
+                    processed_lines.append(current_line.strip())
+                    current_line = word + ' '
+            processed_lines.append(current_line.strip())  # Add the last or only line of the segment
+
+        # Now, print each processed line to the OLED
+        for i, processed_line in enumerate(processed_lines):
+            if i < 8:  # Limit to the display's ability to show lines
+                self.oled.text(processed_line, 0, i * 10)
+    
         self.oled.show()
 
     def print_menu(self, items, selected_item, menu_title):
