@@ -4,7 +4,7 @@ from app.handlers.oled_handler import OLEDHandler as oled
 from lib.state_machine import StateMachine
 from app.handlers.input_handler import InputHandler
 from app.menu.states.main_menu import MainMenuState as MMS
-from lib.wifi_manager import WifiManager
+from lib.wifi.wifi_manager import WifiManager
 
 class Application: 
     _instance = None

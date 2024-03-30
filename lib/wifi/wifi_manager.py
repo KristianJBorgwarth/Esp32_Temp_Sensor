@@ -59,8 +59,8 @@ class WifiManager:
                 time.sleep(3)
                 return True
             else:
-                if attempt % 10 == 0:  # Update the display every 10 attempts to conserve resources
-                    loading_dots = '.' * (attempt // 10 % 4 + 1)  # Cycle through 1-4 dots
+                if attempt % 10 == 0: 
+                    loading_dots = '.' * (attempt // 10 % 4 + 1)
                     self.oled.print_to_screen(connection_message + '\n' + loading_dots)
                 print('.', end='')
                 time.sleep_ms(100)
@@ -119,73 +119,12 @@ class WifiManager:
                 if url == '':
                     wp_handler.handle_root(self.wlan_sta, self.ap_ssid)
                 elif url == 'configure':
-                    self.handle_configure()
+                    wp_handler.handle_configure(self.cd_handler, self.wlan_sta, self.request, self)
                 else:
-                    self.handle_not_found()
+                    wp_handler.handle_not_found()
         except Exception as error:
             if self.debug:
                 print(error)
             return
         finally:
             self.client.close()
-
-    def send_header(self, status_code = 200):
-        self.client.send("""HTTP/1.1 {0} OK\r\n""".format(status_code))
-        self.client.send("""Content-Type: text/html\r\n""")
-        self.client.send("""Connection: close\r\n""")
-
-    def send_response(self, payload, status_code = 200):
-        self.send_header(status_code)
-        self.client.sendall("""
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <title>WiFi Manager</title>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1">
-                    <link rel="icon" href="data:,">
-                </head>
-                <body>
-                    {0}
-                </body>
-            </html>
-        """.format(payload))
-        self.client.close()
-
-    def handle_configure(self):
-        match = re.search('ssid=([^&]*)&password=(.*)', url_decoder.url_decode(self.request))
-        if match:
-            ssid = match.group(1).decode('utf-8')
-            password = match.group(2).decode('utf-8')
-            if len(ssid) == 0:
-                self.send_response("""
-                    <p>SSID must be providaded!</p>
-                    <p>Go back and try again!</p>
-                """, 400)
-            elif self.wifi_connect(ssid, password):
-                self.send_response("""
-                    <p>Successfully connected to</p>
-                    <h1>{0}</h1>
-                    <p>IP address: {1}</p>
-                """.format(ssid, self.wlan_sta.ifconfig()[0]))
-                profiles = self.cd_handler.read_credentials()
-                profiles[ssid] = password
-                self.cd_handler.write_credentials(profiles)
-                time.sleep(5)
-            else:
-                self.send_response("""
-                    <p>Could not connect to</p>
-                    <h1>{0}</h1>
-                    <p>Go back and try again!</p>
-                """.format(ssid))
-                time.sleep(5)
-        else:
-            self.send_response("""
-                <p>Parameters not found!</p>
-            """, 400)
-            time.sleep(5)
-
-    def handle_not_found(self):
-        self.send_response("""
-            <p>Page not found!</p>
-        """, 404)
