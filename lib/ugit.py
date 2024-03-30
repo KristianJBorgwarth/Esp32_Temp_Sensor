@@ -1,10 +1,3 @@
-# ugit
-# micropython OTA update from github
-# Created by TURFPTAx for the openmuscle project
-# Check out https://openmuscle.org for more info
-#
-# Pulls files and folders from open github repository
-
 import os
 import urequests
 import json
@@ -17,64 +10,39 @@ import gc
 
 global internal_tree
 
-#### -------------User Variables----------------####
-#### 
-# Default Network to connect using wificonnect()
 ssid = "Telenor9920bue"
 password = "TYuY7QQKH"
-
-# CHANGE TO YOUR REPOSITORY INFO
-# Repository must be public if no personal access token is supplied
 user = 'KristianJBorgwarth'
 repository = 'Esp32_Temp_Sensor'
 token = ''
-# Change this variable to 'master' or any other name matching your default branch
 default_branch = 'main'
-
-# Don't remove ugit.py from the ignore_files unless you know what you are doing :D
-# Put the files you don't want deleted or updated here use '/filename.ext'
 ignore_files = ['/ugit.py', 'wifi.dat', 'README.md', "pymakr.conf"]
 ignore = ignore_files
-### -----------END OF USER VARIABLES ----------####
-
-# Static URLS
-# GitHub uses 'main' instead of master for python repository trees
 giturl = 'https://github.com/{user}/{repository}'
 call_trees_url = f'https://api.github.com/repos/{user}/{repository}/git/trees/{default_branch}?recursive=1'
 raw = f'https://raw.githubusercontent.com/{user}/{repository}/master/'
 
 def pull(f_path, raw_url):
-    print(f'Pulling {f_path} from GitHub...')
-    headers = {'User-Agent': 'ugit-turfptax'}
-    if token:
-        headers['Authorization'] = f"Bearer {token}"
-    r = urequests.get(raw_url, headers=headers)
-    content = r.text  # Assuming the server returns UTF-8 text
-    r.close()
+    print(f'Attempting to pull {f_path} from GitHub...')
     gc.collect()
-    print("free mem after pull: ", gc.mem_free())
+    print("Free memory before fetch:", gc.mem_free())
+    headers = {'User-Agent': 'ugit-turfptax'}
     try:
-        with open(f_path, 'w') as new_file:
-            new_file.write(content)
-            verify_file_write(f_path)
-    except Exception as e:
-        print(f'Error writing {f_path}: {e}')
-    finally:
-        gc.collect()
-        print("free mem after operation: ", gc.mem_free())
-
-
-def verify_file_write(path):
-    try:
-        stat_info = os.stat(path)
-        if stat_info and stat_info[6] > 0:  # Checking file size > 0
-            print(f"Verification successful for {path}")
+        response = urequests.get(raw_url, headers=headers)
+        if response.status_code == 200:
+            content = response.content
+            with open(f_path, 'wb') as file:
+                file.write(content)
+            print(f"{f_path} fetched successfully.")
         else:
-            print(f"Verification failed for {path}: Empty file")
-    except OSError:
-        print(f"Verification failed for {path}: File not found")
-
-
+            print(f"Failed to fetch {f_path}: HTTP {response.status_code}")
+    except Exception as e:
+        print(f"Exception fetching {f_path}: {e}")
+    finally:
+        response.close()
+        gc.collect()
+        print("Free memory after fetch:", gc.mem_free())
+        time.sleep(1)
 
 def pull_all(tree=call_trees_url,raw = raw,ignore = ignore,isconnected=False):
   if not isconnected:
@@ -86,7 +54,6 @@ def pull_all(tree=call_trees_url,raw = raw,ignore = ignore,isconnected=False):
   print(' ignore removed ----------------------')
   print(internal_tree)
   log = []
-  # download and save all files
   for i in tree['tree']:
     if i['type'] == 'tree':
       try:
@@ -98,12 +65,14 @@ def pull_all(tree=call_trees_url,raw = raw,ignore = ignore,isconnected=False):
         os.remove(i['path'])
         log.append(f'{i["path"]} file removed from int mem')
         internal_tree = remove_item(i['path'],internal_tree)
+        gc.collect()
       except:
         log.append(f'{i["path"]} del failed from int mem')
         print('failed to delete old file')
       try:
         pull(i['path'],raw + i['path'])
         log.append(i['path'] + ' updated')
+        gc.collect()
       except:
         log.append(i['path'] + ' failed to pull')
   # delete files not in Github tree
@@ -121,8 +90,6 @@ def pull_all(tree=call_trees_url,raw = raw,ignore = ignore,isconnected=False):
   #return check instead return with global
 
 def wificonnect(ssid=ssid,password=password):
-    print('Use: like ugit.wificonnect(SSID,Password)')
-    print('otherwise uses ssid,password in top of ugit.py code')
     wlan = network.WLAN(network.STA_IF)
     wlan.active(False)
     wlan.active(True)
@@ -130,8 +97,6 @@ def wificonnect(ssid=ssid,password=password):
     while not wlan.isconnected():
         pass
     print('Wifi Connected!!')
-    print(f'SSID: {ssid}')
-    print('Local Ip Address, Subnet Mask, Default Gateway, Listening on...')
     print(wlan.ifconfig())
     return wlan
   
@@ -162,7 +127,6 @@ def add_to_tree(dir_item):
     except OSError: # type: ignore # for removing the type error indicator :)
       print(f'{dir_item} could not be added to tree')
 
-
 def get_hash(file_path):
     hasher = hashlib.sha1()
     with open(file_path, 'rb') as f:
@@ -173,13 +137,6 @@ def get_hash(file_path):
             hasher.update(chunk)
     return binascii.hexlify(hasher.digest()).decode('utf-8')
 
-
-
-def get_data_hash(data):
-    sha1obj = hashlib.sha1(data)
-    hash = sha1obj.digest()
-    return(binascii.hexlify(hash))
-  
 def is_directory(file):
   directory = False
   try:
@@ -190,7 +147,6 @@ def is_directory(file):
 def pull_git_tree(tree_url=call_trees_url,raw = raw):
   gc.collect()
   headers = {'User-Agent': 'ugit-turfptax'} 
-  # ^^^ Github Requires user-agent header otherwise 403
   if len(token) > 0:
       headers['authorization'] = "bearer %s" % token 
   r = urequests.get(tree_url,headers=headers)
@@ -215,12 +171,10 @@ def parse_git_tree():
   print('dirs:',dirs)
   print('files:',files)
    
-   
 def check_ignore(tree=call_trees_url,raw = raw,ignore = ignore):
   os.chdir('/')
   tree = pull_git_tree()
   check = []
-  # download and save all files
   for i in tree['tree']:
     if i['path'] not in ignore:
         print(i['path'] + ' not in ignore')
@@ -243,20 +197,3 @@ def remove_item(item,tree):
         if item not in i:
             culled.append(i)
     return(culled)
-
-def update():
-    print('updates ugit.py to newest version')
-    raw_url = 'https://raw.githubusercontent.com/turfptax/ugit/master/'
-    pull('ugit.py',raw_url+'ugit.py')
-
-def backup():
-    int_tree = build_internal_tree()
-    backup_text = "ugit Backup Version 1.0\n\n"
-    for i in int_tree:
-        data = open(i[0],'r')
-        backup_text += f'FN:SHA1{i[0]},{i[1]}\n'
-        backup_text += '---'+data.read()+'---\n'
-        data.close()
-    backup = open('ugit.backup','w')
-    backup.write(backup_text)
-    backup.close()
