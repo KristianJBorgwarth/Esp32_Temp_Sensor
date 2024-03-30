@@ -6,6 +6,7 @@ import time
 import helpers.import_helper as ih
 from lib.wifi.wifi_credentials_handler import WifiCredentialsHandler
 from lib.wifi.web_page_handler import WebPageHandler
+import lib.wifi.url_decoder as url_decoder
 class WifiManager:
     def __init__(self, ssid = 'WifiManager', password = 'wifimanager', reboot = True, debug = True):
         self.wlan_sta = network.WLAN(network.STA_IF)
@@ -113,7 +114,7 @@ class WifiManager:
                 pass
             if self.request:
                 if self.debug:
-                    print(self.url_decode(self.request))
+                        print(url_decoder.url_decode(self.request))
                 url = re.search('(?:GET|POST) /(.*?)(?:\\?.*?)? HTTP', self.request).group(1).decode('utf-8').rstrip('/')
                 if url == '':
                     wp_handler.handle_root(self.wlan_sta, self.ap_ssid)
@@ -151,37 +152,8 @@ class WifiManager:
         """.format(payload))
         self.client.close()
 
-    def handle_root(self):
-        self.send_header()
-        self.client.sendall("""
-            <!DOCTYPE html>
-            <html lang="en">
-                <head>
-                    <title>WiFi Manager</title>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1">
-                    <link rel="icon" href="data:,">
-                </head>
-                <body>
-                    <h1>WiFi Manager</h1>
-                    <form action="/configure" method="post" accept-charset="utf-8">
-        """.format(self.ap_ssid))
-        for ssid, *_ in self.wlan_sta.scan():
-            ssid = ssid.decode("utf-8")
-            self.client.sendall("""
-                        <p><input type="radio" name="ssid" value="{0}" id="{0}"><label for="{0}">&nbsp;{0}</label></p>
-            """.format(ssid))
-        self.client.sendall("""
-                        <p><label for="password">Password:&nbsp;</label><input type="password" id="password" name="password"></p>
-                        <p><input type="submit" value="Connect"></p>
-                    </form>
-                </body>
-            </html>
-        """)
-        self.client.close()
-
     def handle_configure(self):
-        match = re.search('ssid=([^&]*)&password=(.*)', self.url_decode(self.request))
+        match = re.search('ssid=([^&]*)&password=(.*)', url_decoder.url_decode(self.request))
         if match:
             ssid = match.group(1).decode('utf-8')
             password = match.group(2).decode('utf-8')
@@ -217,30 +189,3 @@ class WifiManager:
         self.send_response("""
             <p>Page not found!</p>
         """, 404)
-
-    def url_decode(self, url_string):
-        if not url_string:
-            return b''
-        if isinstance(url_string, str):
-            url_string = url_string.encode('utf-8')
-        bits = url_string.split(b'%')
-        if len(bits) == 1:
-            return url_string
-        res = [bits[0]]
-        appnd = res.append
-        hextobyte_cache = {}
-        for item in bits[1:]:
-            try:
-                code = item[:2]
-                char = hextobyte_cache.get(code)
-                if char is None:
-                    char = hextobyte_cache[code] = bytes([int(code, 16)])
-                appnd(char)
-                appnd(item[2:])
-            except Exception as error:
-                if self.debug:
-                    print(error)
-                appnd(b'%')
-                appnd(item)
-        return b''.join(res)
-
