@@ -16,7 +16,7 @@ user = 'KristianJBorgwarth'
 repository = 'Esp32_Temp_Sensor'
 token = ''
 default_branch = 'main'
-ignore_files = ['/ugit.py', 'wifi.dat', 'README.md', "pymakr.conf"]
+ignore_files = ['/lib/ugit.py', 'wifi.dat', 'README.md', "pymakr.conf"]
 ignore = ignore_files
 giturl = 'https://github.com/{user}/{repository}'
 call_trees_url = f'https://api.github.com/repos/{user}/{repository}/git/trees/{default_branch}?recursive=1'
@@ -53,7 +53,6 @@ def pull_all(tree=call_trees_url,raw = raw,ignore = ignore,isconnected=False):
   internal_tree = remove_ignore(internal_tree)
   print(' ignore removed ----------------------')
   print(internal_tree)
-  log = []
   for i in tree['tree']:
     if i['type'] == 'tree':
       try:
@@ -63,31 +62,22 @@ def pull_all(tree=call_trees_url,raw = raw,ignore = ignore,isconnected=False):
     elif i['path'] not in ignore:
       try:
         os.remove(i['path'])
-        log.append(f'{i["path"]} file removed from int mem')
         internal_tree = remove_item(i['path'],internal_tree)
         gc.collect()
       except:
-        log.append(f'{i["path"]} del failed from int mem')
-        print('failed to delete old file')
+        continue
       try:
         pull(i['path'],raw + i['path'])
-        log.append(i['path'] + ' updated')
         gc.collect()
       except:
-        log.append(i['path'] + ' failed to pull')
-  # delete files not in Github tree
+         continue
   if len(internal_tree) > 0:
       print(internal_tree, ' leftover!')
       for i in internal_tree:
           os.remove(i)
-          log.append(i + ' removed from int mem')
-  logfile = open('ugit_log.py','w')
-  logfile.write(str(log))
-  logfile.close()
   time.sleep(10)
   print('resetting machine in 10: machine.reset()')
   machine.reset()
-  #return check instead return with global
 
 def wificonnect(ssid=ssid,password=password):
     wlan = network.WLAN(network.STA_IF)
