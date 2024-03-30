@@ -16,7 +16,7 @@ user = 'KristianJBorgwarth'
 repository = 'Esp32_Temp_Sensor'
 token = ''
 default_branch = 'main'
-ignore_files = ['/lib/ugit.py', 'wifi.dat', 'README.md', "pymakr.conf"]
+ignore_files = ['/lib/ugit.py', 'README.md', "pymakr.conf"]
 ignore = ignore_files
 giturl = 'https://github.com/{user}/{repository}'
 call_trees_url = f'https://api.github.com/repos/{user}/{repository}/git/trees/{default_branch}?recursive=1'
