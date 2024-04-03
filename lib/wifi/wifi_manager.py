@@ -8,7 +8,7 @@ from lib.wifi.wifi_credentials_handler import WifiCredentialsHandler
 from lib.wifi.web_page_handler import WebPageHandler
 import lib.wifi.url_decoder as url_decoder
 class WifiManager:
-    def __init__(self, ssid = 'WifiManager', password = 'wifimanager', reboot = True, debug = True):
+    def __init__(self, ssid = 'WifiManager', password = 'wifimanager', reboot = True, debug = True, ):
         self.wlan_sta = network.WLAN(network.STA_IF)
         self.wlan_sta.active(True)
         self.wlan_ap = network.WLAN(network.AP_IF)
