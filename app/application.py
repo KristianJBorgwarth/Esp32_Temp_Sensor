@@ -6,6 +6,7 @@ from app.handlers.input_handler import InputHandler
 from app.menu.states.main_menu import MainMenuState as MMS
 from lib.wifi.wifi_manager import WifiManager
 from app.handlers.mqtt_handler import MqttHandler
+from app.handlers.temp_handler import TempHandler
 
 class Application: 
     _instance = None
@@ -26,6 +27,7 @@ class Application:
         self.add_object("mqtt", mqtt)
         self.add_object("cpm", wfm)
         self.add_object("input", InputHandler())
+        self.add_object("temp_sensor", TempHandler())
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"))), "update")
 
     def start(self):
