@@ -5,6 +5,7 @@ from lib.state_machine import StateMachine
 from app.handlers.input_handler import InputHandler
 from app.menu.states.main_menu import MainMenuState as MMS
 from lib.wifi.wifi_manager import WifiManager
+from app.handlers.mqtt_handler import MqttHandler
 
 class Application: 
     _instance = None
@@ -21,6 +22,8 @@ class Application:
         print("Initializing the app")
         self.add_object("oled", oled())
         wfm = self.initialize_wifi()
+        mqtt = self.initialize_mqtt()
+        self.add_object("mqtt", mqtt)
         self.add_object("cpm", wfm)
         self.add_object("input", InputHandler())
         self.add_object("msm", StateMachine(MMS(self.get_object("oled"))), "update")
@@ -62,6 +65,11 @@ class Application:
         wfm = WifiManager("ESP32_AP", "12345678")
         wfm.connect()
         return wfm
+    
+    def initialize_mqtt(self):
+        mqtt = MqttHandler()
+        mqtt.connect()
+        return mqtt
     
 
 
