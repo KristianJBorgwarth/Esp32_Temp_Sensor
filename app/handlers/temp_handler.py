@@ -14,8 +14,7 @@ class TempHandler:
             self.temperature = esp32.raw_temperature()
             self.temperature = self.convert_temp_to_celsius(self.temperature)
             self.mqtt.publish(str(self.temperature))
-            print("Temperature: " + str(self.temperature))
-            time.sleep(1)
+            time.sleep(6)
 
     def start(self):
         if not self.isRunning:
@@ -24,7 +23,6 @@ class TempHandler:
                 
     def stop(self):
         self.isRunning = False
-        print("Temperature measurement stopped")
 
     def convert_temp_to_celsius(self, raw_temp):
         return (raw_temp - 32) * 5.0/9.0
