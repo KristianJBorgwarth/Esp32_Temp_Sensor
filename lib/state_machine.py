@@ -43,7 +43,4 @@ class StateMachine:
     def get_state(self):
         return self._current_state
 
-    def get_previous_state(self):
-        return self._previous_state
-
 
