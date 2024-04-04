@@ -20,5 +20,8 @@ class UpdateMenuItem(MenuItem):
         self.display_text = "UPDATE"
     
     def command(self):
+        app = imph.import_app()
+        #remove all objects from the app, bc we are going to update the firmware and we have zero fucking memory on this thing
+        app.clear_all_objects()
         ota.pull_all(isconnected=True)
         
