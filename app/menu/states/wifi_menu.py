@@ -4,12 +4,12 @@ from app.menu.items.core_menu_items import BackMenuItem
 from app.menu.items.wifi_menu_items import CaptivePortalMenuItem, SaveWifiMenuItem
 
 class WifiMenuState(IState):
-    def __init__(self, oled):
+    def __init__(self):
         super().__init__()
+        self.oled = imph.import_app().get_object("oled")
         self.input_handler = imph.import_app().get_object("input")
         self.menu_items = None
         self.selected_item = 0
-        self.oled = oled
         
 
     def enter(self):

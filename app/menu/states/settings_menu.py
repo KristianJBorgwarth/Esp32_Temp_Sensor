@@ -4,8 +4,8 @@ from app.menu.items.core_menu_items import BackMenuItem
 import helpers.import_helper as imph
 
 class SettingsMenuState(IState):
-    def __init__(self, oled):
-        self.oled = oled
+    def __init__(self):
+        self.oled = imph.import_app().get_object("oled")
         self.input_handler = imph.import_app().get_object("input")
         self.menu_items = None
         self.selected_item = 0
