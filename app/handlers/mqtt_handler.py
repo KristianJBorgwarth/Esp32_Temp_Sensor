@@ -1,7 +1,4 @@
-import time
 from umqtt.simple import MQTTClient
-import machine 
-
 
 class MqttHandler:
     def __init__(self):

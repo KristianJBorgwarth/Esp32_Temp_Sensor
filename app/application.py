@@ -73,6 +73,11 @@ class Application:
         mqtt.connect()
         return mqtt
     
+    def clear_all_objects(self):
+        self._objects.clear()
+        gc.collect()
+        print("Bulk delete done")
+    
 
 
     
