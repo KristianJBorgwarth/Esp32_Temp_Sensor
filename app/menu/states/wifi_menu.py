@@ -1,7 +1,6 @@
 from lib.state_machine import IState
 from app.menu.items.core_menu_items import BackMenuItem
 from app.menu.items.wifi_menu_items import CaptivePortalMenuItem, SaveWifiMenuItem
-import gc 
 
 class WifiMenuState(IState):
     def __init__(self):

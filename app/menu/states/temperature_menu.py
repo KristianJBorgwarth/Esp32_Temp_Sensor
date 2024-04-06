@@ -1,7 +1,6 @@
 from app.menu.items.core_menu_items import BackMenuItem
 from lib.state_machine import IState
 from app.menu.items.temp_menu_items import StartMenuItem, StopMenuItem
-import gc
 
 class TemperatureMenuState(IState):
     def __init__(self):
@@ -15,4 +14,4 @@ class TemperatureMenuState(IState):
         super().execute()
 
     def exit(self):
-        gc.collect()
+        super().exit()
