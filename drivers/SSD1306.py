@@ -1,5 +1,4 @@
 #MicroPython SSD1306 OLED driver, I2C and SPI interfaces created by Adafruit
-
 import time
 import framebuf
 
@@ -21,7 +20,6 @@ SET_DISP_CLK_DIV    = const(0xd5)
 SET_PRECHARGE       = const(0xd9)
 SET_VCOM_DESEL      = const(0xdb)
 SET_CHARGE_PUMP     = const(0x8d)
-
 
 class SSD1306:
     def __init__(self, width, height, external_vcc):
@@ -99,7 +97,6 @@ class SSD1306:
     def text(self, string, x, y, col=1):
         self.framebuf.text(string, x, y, col)
 
-
 class SSD1306_I2C(SSD1306):
     def __init__(self, width, height, i2c, addr=0x3c, external_vcc=False):
         self.i2c = i2c
@@ -127,7 +124,6 @@ class SSD1306_I2C(SSD1306):
 
     def poweron(self):
         pass
-
 
 class SSD1306_SPI(SSD1306):
     def __init__(self, width, height, spi, dc, res, cs, external_vcc=False):

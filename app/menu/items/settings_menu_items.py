@@ -12,7 +12,7 @@ class WifiMenuItem(MenuItem):
         app = imph.import_app()
         stm = app.get_object("msm", "update")
         oled = app.get_object("oled")
-        stm.change_state(WifiMenuState(oled))        
+        stm.change_state(WifiMenuState())        
 
 class UpdateMenuItem(MenuItem):
     def __init__(self):

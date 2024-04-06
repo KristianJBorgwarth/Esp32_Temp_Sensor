@@ -1,6 +1,5 @@
 from lib.state_machine import IState
 import helpers.import_helper as imph
-import gc
 
 class CaptivePortalMenu(IState):
     def __init__(self):
@@ -28,7 +27,6 @@ class CaptivePortalMenu(IState):
             self.captive_portal.run_web_server()
 
     def exit(self):
-        gc.collect()
-        self.oled.clear_screen()
+        super().exit()
 
     

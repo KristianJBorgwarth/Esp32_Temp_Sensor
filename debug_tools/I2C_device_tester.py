@@ -6,7 +6,6 @@ class I2CDeviceTester:
         self.sda_pin = sda_pin
         self.i2c = SoftI2C(scl=Pin(scl_pin), sda=Pin(sda_pin))
 
-        
     def check_display_connection(self):
         devices = self.i2c.scan()
         if devices:

@@ -11,8 +11,7 @@ class SettingsMenuItem(MenuItem):
     def command(self):
         app = imph.import_app()
         stm = app.get_object("msm", "update")
-        oled = app.get_object("oled")
-        stm.change_state(SettingsMenuState(oled))
+        stm.change_state(SettingsMenuState())
 
 class TemperatureMenuItem(MenuItem):
     def __init__(self):
