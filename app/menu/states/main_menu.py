@@ -12,7 +12,6 @@ class MainMenuState(IState):
 
     def execute(self):
         super().execute()
-        print("llolsd")
 
     def exit(self):
         super().exit()
