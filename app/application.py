@@ -24,7 +24,7 @@ class Application:
         self.add_object("oled", oled())
         wfm = self.initialize_wifi()
         mqtt = self.initialize_mqtt()
-        self.add_object("mqtt", mqtt)
+        self.add_object("mqtt", mqtt, "update")
         self.add_object("cpm", wfm)
         self.add_object("input", InputHandler())
         self.add_object("temp_sensor", TempHandler())
@@ -71,10 +71,12 @@ class Application:
     def initialize_mqtt(self):
         mqtt = MqttHandler()
         mqtt.connect()
+        mqtt.subscribe()
         return mqtt
     
     def clear_all_objects(self):
         self._objects.clear()
+        self._updateObjects.clear()
         gc.collect()
         print("Bulk delete done")
     
