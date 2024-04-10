@@ -5,7 +5,7 @@ import time
 
 class TempHandler:
     def __init__(self):
-        self.mqtt = imph.import_app().get_object("mqtt")
+        self.mqtt = imph.import_app().get_object("mqtt", "update")
         self.temperature = 0
         self.isRunning = False
     
