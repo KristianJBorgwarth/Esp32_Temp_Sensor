@@ -31,7 +31,6 @@ class MqttHandler:
     def on_message(self, topic, message):
         message = message.decode('utf-8')
         print("Received message:{}".format(message))
-        
         try:
             data = ujson.loads(message)
             if data.get("action")=="update":
