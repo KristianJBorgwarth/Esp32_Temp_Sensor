@@ -50,5 +50,6 @@ class MqttHandler:
         except Exception as e:
             print("Error in MQTT update: " + str(e))
             self.MQTTCLIENT.connect()
+        gc.collect()
             
     
